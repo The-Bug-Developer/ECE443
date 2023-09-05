@@ -1,0 +1,69 @@
+xQueueHandle xQueue;
+
+paraTrooper input;
+
+int main(){
+    vSetupEnvironment();
+    xQueueCreate(3, sizeof(long))
+    if(xQueue){
+        xTaskCreate(
+            vButton,   // Function Pointer
+            "Button1", // Shorthand for the function
+            240,       // Word Depth
+            void *pvParameters,      // parameters
+            1,         // priority
+            NULL,      // handle
+        );
+        xTaskCreate(
+            vButton,   // Function Pointer
+            "Button2", // Shorthand for the function
+            240,       // Word Depth
+            void *input,      // parameters
+            1,         // priority
+            NULL,      // handle
+        );
+
+        xTaskCreate(
+            vLED, // Function Pointer
+            "LED",   // Shorthand for the function
+            240,      // Word Depth
+            void *input,     // parameters
+            1,        // priority
+            NULL,     // handle
+        );
+
+        vStartTaskScheduler();
+    }
+    else{
+        LATGSET = LED3;
+    }
+    while(1){};
+}
+
+void vLED (void *pvParameters){
+    if(pvParamters.toggleA){
+        LATGSET = LED1;
+    }
+    else{
+        LATGCLR = LED1;
+    }
+    if(pvParamters.toggleB){
+        LATGSET = LED2;
+    }
+    else{
+        LATGCLR = LED2;
+    }
+    vTaskDelete(NULL);
+}
+
+void vButton(void *pvParameters){
+    Timer1delay(20);
+
+
+}
+
+struct paraTrooper{
+    public:
+        uint toggleA = 0;
+        uint toggleB = 0;
+}
