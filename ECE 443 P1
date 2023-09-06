@@ -1,69 +1,88 @@
-xQueueHandle xQueue;
+xQueueHandle xQueueA;
+xQueueHandle xQueueB;
 
-paraTrooper input;
+uint but1 = 1;
+uint but2 = 2;
 
 int main(){
     vSetupEnvironment();
-    xQueueCreate(3, sizeof(long))
-    if(xQueue){
+    xQueueACreate(2, sizeof(long));
+    xQueueBCreate(2, sizeof(long));
+    if(xQueueA && xQueueB){
         xTaskCreate(
-            vButton,   // Function Pointer
-            "Button1", // Shorthand for the function
+            vStarter,   // Function Pointer
+            "Starter", // Shorthand for the function
             240,       // Word Depth
-            void *pvParameters,      // parameters
-            1,         // priority
+            NULL,      // parameters
+            2,         // priority
             NULL,      // handle
         );
-        xTaskCreate(
-            vButton,   // Function Pointer
-            "Button2", // Shorthand for the function
-            240,       // Word Depth
-            void *input,      // parameters
-            1,         // priority
-            NULL,      // handle
-        );
-
-        xTaskCreate(
-            vLED, // Function Pointer
-            "LED",   // Shorthand for the function
-            240,      // Word Depth
-            void *input,     // parameters
-            1,        // priority
-            NULL,     // handle
-        );
-
         vStartTaskScheduler();
     }
     else{
         LATGSET = LED3;
     }
     while(1){};
+    return 0;
 }
 
 void vLED (void *pvParameters){
-    if(pvParamters.toggleA){
-        LATGSET = LED1;
+    uint read[2];
+    portBase_Type xStatus;
+    const portTickType xTicksToWait = 100/portTICK_RATE_MS;
+    read[0] = xQueueRecieve(xQueueA,);
+    while(1){
+        if(!uxQueueMessageWaiting(xQueueA && !uxQueueMessageWaiting(xQueueB)){
+            //Something
+        }
+
+
     }
-    else{
-        LATGCLR = LED1;
-    }
-    if(pvParamters.toggleB){
-        LATGSET = LED2;
-    }
-    else{
-        LATGCLR = LED2;
-    }
-    vTaskDelete(NULL);
 }
 
 void vButton(void *pvParameters){
-    Timer1delay(20);
-
-
+    uint sent;
+    portBase_Type xStatus;
+    if(*pvParamters == 1){
+        sent = BTN1;
+        xStatus = xQueueSendToBack(xQueueA,&sent,0);
+    }
+    else{
+        sent = BTN2;
+        xStatus = xQueueSendToBack(xQueueB,&sent,0);
+    }
+    if (xStatus != pdPASS){
+        //Do something, I don't think we're messing around with print
+        //statements in this lab
+    }
+    taskYield();
 }
+void vStarter(){
+    xTaskCreate(
+        vButton,   // Function Pointer
+        "Button1", // Shorthand for the function
+        240,       // Word Depth
+        (uint *) but1,      // parameters
+        1,         // priority
+        NULL,      // handle
+    );
+    xTaskCreate(
+        vButton,   // Function Pointer
+        "Button2", // Shorthand for the function
+        240,       // Word Depth
+        (uint *) but2,      // parameters
+        1,         // priority
+        NULL,      // handle
+    );
 
-struct paraTrooper{
-    public:
-        uint toggleA = 0;
-        uint toggleB = 0;
+    xTaskCreate(
+        vLED, // Function Pointer
+        "LED",   // Shorthand for the function
+        240,      // Word Depth
+        NULL,     // parameters
+        1,        // priority
+        NULL,     // handle
+    );
+
+    vTaskDelete(NULL);
 }
